@@ -12,10 +12,11 @@ function Page() {
   const [posts2, setPosts2] = useState([]);
   const [posts3, setPosts3] = useState([]);
   const [st_cda, setCDA] = useState([]);
-  const [st_veiculo, setVEICULO] = useState([]);
+  const [st_veiculo, setVEICULO] = useState([]);  
   const [st_cdapadrao, setID_CDAPARAO] = useState([]);
   const [set_formlitros,  set_FormLitros] = useState([]);
   const [set_formedia, set_FormMedia] = useState([]);
+  const [set_disVeiculos, set_VeiculosDisponivel] = useState([]);
   const [buttonPopup, setButtonPopup] = useState(false);
   const [buttonPopup1, setButtonPopup1] = useState(false);
   const [buttonPopup2, setButtonPopup2] = useState(false);
@@ -25,7 +26,7 @@ function Page() {
   const [set_fornewmedia, set_FormNewMedia] = useState([]);
 
 
-  const [set_newveiculo, set_NewVeiculo] = useState("1");
+  const [set_newveiculo, set_NewVeiculo] = useState([]);
   const [set_newformedia, set_NewFormMedia] = useState("1");
   const [value, setValue]  = useState("0") ;
 
@@ -74,8 +75,15 @@ function Page() {
     }
 
 
-    const handleChangeNewCda = (e) => {
+     async function  handleChangeNewCda (e) {
       set_NewFormMedia(e.target.value);
+      console.log(set_newformedia)
+
+
+      const dados1 = {idcda:set_newformedia}
+
+      console.log(dados1)
+    
 
     }
     const handleChangeNewViculos = (e) => {
@@ -101,12 +109,13 @@ function Page() {
 
     const not = () => {
       setEDITAR(false);
-
-
+      setButtonPopup1(false);
     }
 
     const popup = () => {
       setButtonPopup2(true)
+
+
     }
 
 
@@ -121,6 +130,15 @@ function Page() {
       }
 
 
+    }
+
+    async function handleSubmitNovo (e){
+      e.preventDefault()
+      const dados ={id: set_newformedia}
+      const  res = await api.post('pesquisa',dados)
+      console.log("apsadasdasdasdasiRes",res)
+      set_VeiculosDisponivel(res.data)
+      console.log(set_disVeiculos) ;
     }
 
     async function handleSubmit (e){
@@ -154,21 +172,22 @@ function Page() {
             Teste
           </h2>
         </header>
-        <form onSubmit={handleSubmit}>
+        <form className=""onSubmit={handleSubmit}>
+        <button className="enviar" onClick={popup}>Novo</button>
           <label>
-            <select  onChange={handleChange}>
-            <option value="0">Todos</option>
+            <select className="option"  onChange={handleChange}>
+            <option className="option" value="0">Todos</option>
               {posts1.map((posts) => (     
                 <option value={posts.id_cda}>{posts.descricao}</option>
               ))}
             </select>
           </label>
-          <input type="submit" value="Submit" />
+          <input className="enviar2 margin-fix2" type="submit" value ="Submit"/>
+          
         </form>
-        <button className="enviar" onClick={popup}>Novo</button>
+
         <table className="tabela1">
           <thead>
-            <th>Serial</th>
             <th>CDM</th>
             <th>Modelo</th>
             <th>Qtd. de Litros</th>
@@ -181,7 +200,6 @@ function Page() {
             <tbody>
               {posts2.map((posts) => (     
                   <tr>
-                    <td>{posts.id_cda}</td>
                     <td>{posts.cda_descricao}</td>
                     <td>{posts.veiculo_descricao}</td>
                     <td>{posts.qtd_litros_abastec_padrao}</td>
@@ -220,32 +238,48 @@ function Page() {
 
 
         <Popup trigger={buttonPopup1} setTriger={setButtonPopup1} >
-          <button onClick={teste}>Sim</button>
-          <button onClick={not}>Nao</button>
+          <h3 className="ajuste text-center">Deseja realmente editar este ...?</h3>
+          <div className="simenao">  
+            <button className="enviar2" onClick={teste}>Sim</button>
+            <button className="enviar"onClick={not}>Nao</button>
+          </div>
         </Popup>
 
         <Popup trigger={buttonPopup2} setTriger={setButtonPopup2} >
-          <form  onSubmit={handleSubmit1213}>
-            <h1 className="text-center">Novo</h1>
-            <label>
-                <select className="option"  onChange={handleChangeNewCda}>
-                {posts1.map((posts) => (     
-                  <option  value={posts.id_cda}>{posts.descricao}</option>
-                ))}
-              </select>
-            </label>
-            <label>
-              <select className="option" onChange={handleChangeNewViculos}>
-              {posts3.map((posts) => (     
+          
+        <h1 className="text-center margin-fix fonte-grande">Novo</h1> 
+
+
+
+
+        <form className="form-center" onSubmit={handleSubmitNovo}>
+            <h3 className="text-center margin-fix">CDM</h3>
+          <label>
+            
+            <select className="option margin-fix" onChange={handleChangeNewCda}>
+              {posts1.map((posts) => (     
                 <option value={posts.id_cda}>{posts.descricao}</option>
+              ))}
+            </select>
+          </label>
+          <input className="enviar3 margin-fix" type="submit" value ="Submit"/>
+        </form>
+          <form className="form-center" onSubmit={handleSubmit1213}>
+            
+            
+            <label>
+              <h3 className="text-center margin-fix">Modelo de Veículo</h3>
+              <select className="option margin-fix" onChange={handleChangeNewViculos}>
+              {set_disVeiculos.map((posts) => (     
+                <option value={posts.id_modelo}>{posts.descricao}</option>
               ))}
               </select>
             </label>
-              <h3 className="text-center">Qtd. de Litros</h3>
-              <input className="input2"  onChange={handleChangeNewLitros}></input>
-              <h3 className="text-center">Média Padrão</h3>
-              <input className="input2" onChange={handleChangeNewMedia}></input>
-            <input className="enviar enviar2" type="submit" value="Submit"/>
+              <h3 className="text-center margin-fix">Qtd. de Litros</h3>
+              <input className="input2 margin-fix"  onChange={handleChangeNewLitros}></input>
+              <h3 className="text-center margin-fix">Média Padrão</h3>
+              <input className="input2 margin-fix" onChange={handleChangeNewMedia}></input>
+            <input className="enviar enviar2 margin-fix" type="submit" value="Submit"/>
           </form>
         </Popup>
       </div>

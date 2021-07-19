@@ -33,6 +33,26 @@ def banco2():
     curl.close()
     return json.dumps(rows)
 
+
+@app.route('/pesquisa', methods=['POST'])
+def pesquisa():
+    request_data = json.loads(request.data)
+    id_cda = int(request_data['id'])
+    print(id_cda)
+
+    print('dmgpdskpfsdp´dfs´pfds')
+    curl = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    curl.execute("SELECT modelo_veiculos.id_modelo, modelo_veiculos.descricao FROM modelo_veiculos LEFT JOIN cda_padrao_abastecimentos ON (modelo_veiculos.id_modelo = cda_padrao_abastecimentos.id_modelo_veiculo and cda_padrao_abastecimentos.id_cda = %s) WHERE modelo_veiculos.id_modelo IS NULL OR cda_padrao_abastecimentos.id_modelo_veiculo IS NULL",(id_cda,))
+    rows = curl.fetchall()
+    curl.close()
+    return json.dumps(rows)
+
+
+
+
+
+
+
 @app.route('/filter', methods=['POST'])
 def banco3():
     request_data = json.loads(request.data)

@@ -26,7 +26,7 @@ function Page() {
   const [set_fornewmedia, set_FormNewMedia] = useState([]);
 
 
-  const [set_newveiculo, set_NewVeiculo] = useState([]);
+  const [set_newveiculo, set_NewVeiculo] = useState("1");
   const [set_newformedia, set_NewFormMedia] = useState("1");
   const [value, setValue]  = useState("0") ;
 
@@ -269,7 +269,9 @@ function Page() {
             
             <label>
               <h3 className="text-center margin-fix">Modelo de Veículo</h3>
+
               <select className="option margin-fix" onChange={handleChangeNewViculos}>
+              <option hidden value="0"></option>
               {set_disVeiculos.map((posts) => (     
                 <option value={posts.id_modelo}>{posts.descricao}</option>
               ))}

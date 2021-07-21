@@ -1,291 +1,259 @@
 import React,{useState, useEffect} from  'react';
-import { getPosts, getPosts1, getPosts2 }  from '../services/Post.services';
-import Popup from '../Pages/teste';
 import 'reactjs-popup/dist/index.css';
-import Select from "react-dropdown-select";
-import api from '../services/api'
+import api from '../services/api';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import Button from '@material-ui/core/Button';
+import NativeSelect from '@material-ui/core/NativeSelect';
+import InputBase from '@material-ui/core/InputBase';
+import Popup from '../Pages/teste';
 
 
 function Page() {
-  const [posts, setPosts] = useState([]);
-  const [posts1, setPosts1] = useState([]);
-  const [posts2, setPosts2] = useState([]);
-  const [posts3, setPosts3] = useState([]);
-  const [st_cda, setCDA] = useState([]);
-  const [st_veiculo, setVEICULO] = useState([]);  
-  const [st_cdapadrao, setID_CDAPARAO] = useState([]);
-  const [set_formlitros,  set_FormLitros] = useState([]);
-  const [set_formedia, set_FormMedia] = useState([]);
-  const [set_disVeiculos, set_VeiculosDisponivel] = useState([]);
-  const [buttonPopup, setButtonPopup] = useState(false);
-  const [buttonPopup1, setButtonPopup1] = useState(false);
-  const [buttonPopup2, setButtonPopup2] = useState(false);
-  const [st_editar, setEDITAR] = useState(true);
-  
+
+  //array
+  const [CDAS, setCDAS] = useState([]);
+  const [Filter, setFilter] = useState([]);
+  const [PesquisaVeiculo, setPesquisaVeiculo] = useState([]);
   const [set_formnewlitros,  set_FormNewLitros] = useState([]);
   const [set_fornewmedia, set_FormNewMedia] = useState([]);
 
+  //popups
+  const [ButtonPopupNOVO, setButtonPopupNOVO] = useState(false);
+  const [buttonPopup, setButtonPopup] = useState(false);
+  const [ButtonPopupDeletar, setButtonPopupDeletar] = useState(false);
 
-  const [set_newveiculo, set_NewVeiculo] = useState("1");
-  const [set_newformedia, set_NewFormMedia] = useState("1");
-  const [value, setValue]  = useState("0") ;
+  //array mapeadas
+  const [st_cda, setCDA] = useState([]);
+  const [st_veiculo, setVEICULO] = useState([]);  
+  const [st_cdapadrao, setID_CDAPARAO] = useState([]);
 
-    function fetchPosts() {
-      getPosts()
-        .then(obj => setPosts(obj))
+  //formularios
+  const [set_formlitros,  set_FormLitros] = useState([]);
+  const [set_formedia, set_FormMedia] = useState([]);
+
+  //Select
+  const [NewNewCda, SetNewCda] = React.useState("1");
+  const [Formveiculo, SetFormveiculo] = React.useState("0");
+  const [indexCDAS, setindexCDAS] = React.useState("0");
+
+ //useEffect
+  useEffect( () =>{
+    async function getcda(){
+      const  res = await api.get('cdas');
+      setCDAS(res.data)
     }
+    getcda()
+  }, [])
 
-    function fetchPosts1() {
-      getPosts1()
-      .then(obj => setPosts1(obj))
-    }
-
-    function fetchPosts2() {
-      getPosts2()
-      .then(obj => setPosts3(obj))
-    }
-
-
-
-
-    useEffect(() =>{
-      fetchPosts()
-      fetchPosts1()
-      fetchPosts2()
-    }, [])
-
-    useEffect(() =>{
-      console.log(posts,posts1,posts2,posts3)
-    }, [posts])
-
-
-
-    const handleChange = (e) => {
-      setValue(e.target.value);
-
-    }
-
-    const handleChangeMedia = (e) => {
-      set_FormMedia(e.target.value);
-
-    }
-    const handleChangeLitros = (e) => {
-      set_FormLitros(e.target.value);
-
-    }
-
-
-     async function  handleChangeNewCda (e) {
-      set_NewFormMedia(e.target.value);
-      console.log(set_newformedia)
-
-
-      const dados1 = {idcda:set_newformedia}
-
-      console.log(dados1)
-    
-
-    }
-    const handleChangeNewViculos = (e) => {
-      set_NewVeiculo(e.target.value);
-
-    }
-
-
-    const handleChangeNewMedia = (e) => {
-      set_FormNewMedia(e.target.value);
-
-    }
-    const handleChangeNewLitros = (e) => {
-      set_FormNewLitros(e.target.value);
-
-    }
-
-
-
-
-
-
-
-    const not = () => {
-      setEDITAR(false);
-      setButtonPopup1(false);
-    }
-
-    const popup = () => {
-      setButtonPopup2(true)
-
-
-    }
-
-
-    
-    const teste = () => {
-      setEDITAR(true);
-
-      if (st_editar === true){
-        const dados1 ={ idcdapadrao:st_cdapadrao,litros: set_formlitros, media:set_formedia}
-        console.log(dados1)
-
-      }
-
-
-    }
-
-    async function handleSubmitNovo (e){
-      e.preventDefault()
-      const dados ={id: set_newformedia}
-      const  res = await api.post('pesquisa',dados)
-      console.log("apsadasdasdasdasiRes",res)
-      set_VeiculosDisponivel(res.data)
-      console.log(set_disVeiculos) ;
-    }
-
-    async function handleSubmit (e){
-      e.preventDefault()
-      const dados ={id: value}
+  useEffect( () =>{
+    async function getfilter(){
+      const dados = {value:indexCDAS}
       const  res = await api.post('filter',dados)
-      console.log("apiRes",res)
-      setPosts2(res.data)
-      console.log(posts2) ;
+      setFilter(res.data)
     }
 
-    async function handleSubmit1213 (e){
-
-      const dados1 = {idcda:set_newformedia, idveiculo:set_newveiculo, media:set_fornewmedia , litros:set_formnewlitros}
-
-      console.log(dados1)
-    } 
-
-
-
-    async function handleSubmit1 (e){
-      e.preventDefault()
-      setButtonPopup1(true)
-
+    async function Newform(){
+      const dados = {value:NewNewCda}
+      const  res = await api.post('pesquisa',dados)
+      setPesquisaVeiculo(res.data)
     }
 
-      return(
-        <div className="div1">
-        <header>
-          <h2>
-            Teste
-          </h2>
-        </header>
-        <form className=""onSubmit={handleSubmit}>
-        <button className="enviar" onClick={popup}>Novo</button>
-          <label>
-            <select className="option"  onChange={handleChange}>
-            <option className="option" value="0">Todos</option>
-              {posts1.map((posts) => (     
-                <option value={posts.id_cda}>{posts.descricao}</option>
-              ))}
-            </select>
-          </label>
-          <input className="enviar2 margin-fix2" type="submit" value ="Submit"/>
-          
-        </form>
+    Newform()
+    getfilter()
+  }, [indexCDAS])
 
-        <table className="tabela1">
-          <thead>
-            <th>CDM</th>
-            <th>Modelo</th>
-            <th>Qtd. de Litros</th>
-            <th>Média Padrão</th>
-            <th>Editar</th>
-            <th>Deletar</th>
-          </thead>
-          {
-          (value === value) && 
-            <tbody>
-              {posts2.map((posts) => (     
-                  <tr>
-                    <td>{posts.cda_descricao}</td>
-                    <td>{posts.veiculo_descricao}</td>
-                    <td>{posts.qtd_litros_abastec_padrao}</td>
-                    <td>{posts.media_padrao}</td>
-                    <button className="editar" onClick={() =>{
-                      setButtonPopup(true);
-                      setCDA(posts.cda_descricao);
-                      setVEICULO(posts.veiculo_descricao);
-                      setID_CDAPARAO(posts.id_cda_padrao_abastec);
-                    }
+  //css Select
+  const BootstrapInput = withStyles((theme) => ({
+    root: {
+      'label + &': {
+        marginTop: theme.spacing(3),
+      },
+    },
+    input: {
+      borderRadius: 4,
+      position: 'relative',
+      backgroundColor: theme.palette.background.paper,
+      border: '1px solid #ced4da',
+      fontSize: 16,
+      padding: '10px 26px 10px 12px',
+      transition: theme.transitions.create(['border-color', 'box-shadow']),
+      // Use the system font instead of the default Roboto font.
+      fontFamily: [
+        '-apple-system',
+        'BlinkMacSystemFont',
+        '"Segoe UI"',
+        'Roboto',
+        '"Helvetica Neue"',
+        'Arial',
+        'sans-serif',
+        '"Apple Color Emoji"',
+        '"Segoe UI Emoji"',
+        '"Segoe UI Symbol"',
+      ].join(','),
+      '&:focus': {
+        borderRadius: 4,
+        borderColor: '#80bdff',
+        boxShadow: '0 0 0 0.2rem rgba(0,123,255,.25)',
+      },
+    },
+  }))(InputBase);
 
-                    }>✎</button>
-                    
-                    <td className="X"> X </td>
+  //async
+  async function handleChangeCDA(event){
+    setindexCDAS(event.target.value)
+  }
+  async function handleChangeCDANOVO(event){
+    SetNewCda(event.target.value)
+    const dados = {value:event.target.value}
+    const  res = await api.post('pesquisa',dados)
+    setPesquisaVeiculo(res.data)
+  }
+  async function handleChangeVEICULONOVO(event){
+    SetFormveiculo(event.target.value)
+  }
+  async function EnviaFormularioEditar(event){
+    event.preventDefault()
+    const editarformulario = { cdapadrao:st_cdapadrao, media:set_formedia , litros:set_formlitros}
+    console.log(editarformulario)
+    const  res = await api.post('editar',editarformulario)
+    
 
-                  </tr>
-                
-                  
-              ))}
-            </tbody>
-          }
+  }
+  async function handleSubmitFormularioNovo (e){
 
-        </table>
+    const novoformulario = { id_cda:NewNewCda, id_modelo:Formveiculo, media:set_fornewmedia , litros:set_formnewlitros}
+    const  res = await api.post('inserir',novoformulario)
+
+
+  } 
+
+  //const
+  const popup = () => {
+    setButtonPopupNOVO(true);
+  }
+  const handleChangeMedia = (e) => {
+    set_FormMedia(e.target.value);
+  }
+  const handleChangeLitros = (e) => {
+    set_FormLitros(e.target.value);
+  }
+  const handleChangeNewMedia = (e) => {
+    set_FormNewMedia(e.target.value);
+
+  }
+  const handleChangeNewLitros = (e) => {
+    set_FormNewLitros(e.target.value);
+
+  }
+
+  return(
+    <div className="div1">
+    <header><img src="https://media-exp1.licdn.com/dms/image/C510BAQHml9VWZyqWlw/company-logo_200_200/0/1519864734798?e=2159024400&v=beta&t=UVBa29_a_iO3R70BDj7pu07dBydfs8pPsEG5urcmjE4" width="50" height="50" className="logo" alt="website logo"/></header>
+    <h3>⠀⠀⠀⠀⠀⠀⠀⠀⠀Filtros</h3>
+    <FormControl className="enviar3" >
+    <NativeSelect id="demo-customized-select-native" value={indexCDAS} onChange={handleChangeCDA} input={<BootstrapInput />}>
+      <option value="0">Todos</option>
+        {CDAS.map((posts) => (     
+            <option value={posts.value}>{posts.label}</option>
+      ))}
+
+    </NativeSelect>
+  </FormControl>
+
+  <button className="enviar" onClick={popup}>Novo</button>
+
+  <table className="tabela1">
+    <thead>
+      <th>CDM</th>
+      <th>Modelo</th>
+      <th>Qtd. de Litros</th>
+      <th>Média Padrão</th>
+      <th>Editar</th>
+      <th className="deletartab">Deletar</th>
+    </thead>
+      {
+      (Filter === Filter) && 
+        <tbody>
+          {Filter.map((posts) => (     
+              <tr>
+                <td>{posts.cda_descricao}</td>
+                <td>{posts.veiculo_descricao}</td>
+                <td>{posts.qtd_litros_abastec_padrao}</td>
+                <td>{posts.media_padrao}</td>
+                <td>  <button className="editar" onClick={() =>{
+                  setButtonPopup(true);
+                  setCDA(posts.cda_descricao);
+                  setVEICULO(posts.veiculo_descricao);
+                  setID_CDAPARAO(posts.id_cda_padrao_abastec);
+                }
+                }>✎</button>
+                </td>
+                <td className="X">
+                <button className="x2" onClick={() =>{
+                  setButtonPopupDeletar(true);
+                  setCDA(posts.cda_descricao);
+                  setVEICULO(posts.veiculo_descricao);
+                  setID_CDAPARAO(posts.id_cda_padrao_abastec);
+                }
+                }>X</button>  </td>
+              </tr>
+          ))}
+        </tbody>
+      }
+    </table>
+    
+    <Popup trigger={ButtonPopupNOVO} setTriger={setButtonPopupNOVO} >
+        <FormControl >
+          <h3 className="margin-fix text-center">CDM</h3>
+          <NativeSelect id="demo-customized-select-native" className="margin-fix" value={NewNewCda} onChange={handleChangeCDANOVO} input={<BootstrapInput />}>
+            {CDAS.map((posts) => (     
+                <option value={posts.value}>{posts.label}</option>
+            ))}
+          </NativeSelect>
+      </FormControl>
+      <FormControl >
         
-        <Popup trigger={buttonPopup} setTriger={setButtonPopup} >
-                    <h1 className="text-center">{st_cda}</h1>
-                    <h1 className="text-center">{st_veiculo}</h1>
-                    <form className="form-center" onSubmit={handleSubmit1}>
-                      <h3 className="text-center">Qtd. de Litros</h3>
-                      <input className="input" onChange={handleChangeLitros} ></input>
-                      <h3 className="text-center">Média Padrão</h3>
-                      <input className="input" onChange={handleChangeMedia}></input>
-                      <input type="submit" className="enviar"></input>
-                    </form>
-        </Popup>
-
-
-        <Popup trigger={buttonPopup1} setTriger={setButtonPopup1} >
-          <h3 className="ajuste text-center">Deseja realmente editar este ...?</h3>
-          <div className="simenao">  
-            <button className="enviar2" onClick={teste}>Sim</button>
-            <button className="enviar"onClick={not}>Nao</button>
-          </div>
-        </Popup>
-
-        <Popup trigger={buttonPopup2} setTriger={setButtonPopup2} >
-          
-        <h1 className="text-center margin-fix fonte-grande">Novo</h1> 
-
-
-
-
-        <form className="form-center" onSubmit={handleSubmitNovo}>
-            <h3 className="text-center margin-fix">CDM</h3>
-          <label>
-            
-            <select className="option margin-fix" onChange={handleChangeNewCda}>
-              {posts1.map((posts) => (     
-                <option value={posts.id_cda}>{posts.descricao}</option>
-              ))}
-            </select>
-          </label>
-          <input className="enviar3 margin-fix" type="submit" value ="Submit"/>
-        </form>
-          <form className="form-center" onSubmit={handleSubmit1213}>
-            
-            
-            <label>
-              <h3 className="text-center margin-fix">Modelo de Veículo</h3>
-
-              <select className="option margin-fix" onChange={handleChangeNewViculos}>
-              <option hidden value="0"></option>
-              {set_disVeiculos.map((posts) => (     
-                <option value={posts.id_modelo}>{posts.descricao}</option>
-              ))}
-              </select>
-            </label>
+        <h3 className="margin-fix text-center">⠀⠀⠀⠀⠀Modelo⠀⠀⠀⠀⠀</h3>
+        <NativeSelect id="demo-customized-select-native" className="margin-fix" value={Formveiculo} onChange={handleChangeVEICULONOVO} input={<BootstrapInput />}>
+        <option value="0"></option>
+          {PesquisaVeiculo.map((posts) => (     
+                <option value={posts.value}>{posts.label}</option>
+          ))}
+        </NativeSelect>
+      </FormControl>
+      <form className="form-center" onSubmit={handleSubmitFormularioNovo}>
               <h3 className="text-center margin-fix">Qtd. de Litros</h3>
-              <input className="input2 margin-fix"  onChange={handleChangeNewLitros}></input>
+              <input type="number" min="1" className="input2 margin-fix"  onChange={handleChangeNewLitros}></input>
               <h3 className="text-center margin-fix">Média Padrão</h3>
-              <input className="input2 margin-fix" onChange={handleChangeNewMedia}></input>
-            <input className="enviar enviar2 margin-fix" type="submit" value="Submit"/>
+              <input type="number" min="1" max="99.99" className="input2 margin-fix" onChange={handleChangeNewMedia}></input>
+              <input className="enviar enviar2 margin-fix" type="submit" value="Submit"/>
           </form>
-        </Popup>
-      </div>
-    );
+    </Popup>
+
+    <Popup trigger={buttonPopup} setTriger={setButtonPopup} >
+      <h1 className="text-center">{st_cda}</h1>
+      <h1 className="text-center">{st_veiculo}</h1>
+        <form className="form-center"  onSubmit={EnviaFormularioEditar}>
+          <h3 className="text-center">Qtd. de Litros</h3>
+          <input type="number" min="1" className="input" onChange={handleChangeLitros} ></input>
+          <h3 className="text-center">Média Padrão</h3>
+          <input type="number" min="1" max="99.99" className="input" onChange={handleChangeMedia}></input>
+          <input type="submit" className="enviar"></input>
+        </form>
+    </Popup>
+
+    <Popup trigger={ButtonPopupDeletar} setTriger={setButtonPopupDeletar} >
+      <h2 className="text-center">deseja apagar?</h2>
+      <h1 className="text-center">{st_cda}</h1>
+      <h1 className="text-center">{st_veiculo}</h1>
+    </Popup>
+  </div>
+  
+);
 
 }
 export default Page;

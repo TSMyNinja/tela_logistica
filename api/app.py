@@ -84,7 +84,7 @@ def editar():
     else:
         print('a')
         erro = {
-            'error':0
+            'error'
         }
         return json.dumps(erro)
 
@@ -114,3 +114,35 @@ def deletar():
  
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#     SELECT cpa1.id_cda_padrao_abastec
+# , cpa1.id_cda
+# , cpa1.id_modelo_veiculo
+# ,modelo_veiculos.descricao veiculo_descricao , cdas.descricao cda_descricao
+# ,cpa1.qtd_litros_abastec_padrao
+# ,cpa1.media_padrao 
+# FROM cda_padrao_abastecimentos cpa1
+# inner join cdas on cdas.id_cda =  cpa1.id_cda  
+# inner join modelo_veiculos on cpa1.id_modelo_veiculo  =  modelo_veiculos.id_modelo
+# union all 
+# select null, cda.id_cda, mv.id_modelo, mv.descricao, cda.descricao,0,0 
+# FROM cdas cda, modelo_veiculos mv
+# where not exists (select null 
+# 					from cda_padrao_abastecimentos cpa 
+# 					where cpa.id_cda = cda.id_cda 
+# 					and cpa.id_modelo_veiculo = mv.id_modelo)
+# ;

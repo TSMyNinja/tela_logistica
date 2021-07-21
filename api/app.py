@@ -33,7 +33,7 @@ def banco3():
 
     if id_cda == 0:
         curl1 = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        curl1.execute("SELECT cda_padrao_abastecimentos.id_cda_padrao_abastec, cda_padrao_abastecimentos.id_cda, cda_padrao_abastecimentos.id_modelo_veiculo,modelo_veiculos.descricao veiculo_descricao , cdas.descricao cda_descricao,cda_padrao_abastecimentos.qtd_litros_abastec_padrao,cda_padrao_abastecimentos.media_padrao FROM cda_padrao_abastecimentos inner join cdas on cdas.id_cda =  cda_padrao_abastecimentos.id_cda  inner join modelo_veiculos on cda_padrao_abastecimentos.id_modelo_veiculo  =  modelo_veiculos.id_modelo ;")
+        curl1.execute("SELECT cpa1.id_cda_padrao_abastec, cpa1.id_cda, cpa1.id_modelo_veiculo,modelo_veiculos.descricao veiculo_descricao , cdas.descricao cda_descricao,cpa1.qtd_litros_abastec_padrao,cpa1.media_padrao FROM cda_padrao_abastecimentos cpa1 inner join cdas on cdas.id_cda =  cpa1.id_cda  inner join modelo_veiculos on cpa1.id_modelo_veiculo  =  modelo_veiculos.id_modelo union all select null, cda.id_cda, mv.id_modelo, mv.descricao, cda.descricao,0,0 FROM cdas cda, modelo_veiculos mv where not exists (select null from cda_padrao_abastecimentos cpa where cpa.id_cda = cda.id_cda and cpa.id_modelo_veiculo = mv.id_modelo);")
         rows1 = curl1.fetchall()
         curl1.close()
         return json.dumps(rows1)

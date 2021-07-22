@@ -10,7 +10,7 @@ CORS(app)
 @app.route('/cdas', methods=['GET'])
 def banco1():
     curl = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    curl.execute("SELECT descricao label, id_cda value FROM sys.cdas;")
+    curl.execute("SELECT descricao label, id_cda value FROM cdas;")
     rows = curl.fetchall()
     curl.close()
     return json.dumps(rows)
@@ -30,6 +30,7 @@ def pesquisa():
 def banco3():
     request_data = json.loads(request.data)
     id_cda = int(request_data['value'])
+    print(id_cda)
 
     if id_cda == 0:
         curl1 = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -39,7 +40,7 @@ def banco3():
         return json.dumps(rows1)
 
     curl1 = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    curl1.execute("SELECT cda_padrao_abastecimentos.id_cda_padrao_abastec, cda_padrao_abastecimentos.id_cda , cda_padrao_abastecimentos.id_modelo_veiculo,modelo_veiculos.descricao veiculo_descricao , cdas.descricao cda_descricao,cda_padrao_abastecimentos.qtd_litros_abastec_padrao,cda_padrao_abastecimentos.media_padrao FROM cda_padrao_abastecimentos inner join cdas on cdas.id_cda =  cda_padrao_abastecimentos.id_cda  inner join modelo_veiculos on cda_padrao_abastecimentos.id_modelo_veiculo  =  modelo_veiculos.id_modelo where cda_padrao_abastecimentos.id_cda  = %s ;", (id_cda,))
+    curl1.execute("SELECT cpa1.id_cda_padrao_abastec, cpa1.id_cda, cpa1.id_modelo_veiculo,modelo_veiculos.descricao veiculo_descricao , cdas.descricao cda_descricao,cpa1.qtd_litros_abastec_padrao,cpa1.media_padrao FROM cda_padrao_abastecimentos cpa1 inner join cdas on cdas.id_cda =  cpa1.id_cda  and cdas.id_cda = %s inner join modelo_veiculos on cpa1.id_modelo_veiculo  =  modelo_veiculos.id_modelo union all select null, cda.id_cda, mv.id_modelo, mv.descricao, cda.descricao,0,0  FROM cdas cda, modelo_veiculos mv where not exists (select null from cda_padrao_abastecimentos cpa where cpa.id_cda = cda.id_cda 	and cpa.id_modelo_veiculo = mv.id_modelo) and	cda.id_cda = %s ;",(id_cda,id_cda,))
     rows1 = curl1.fetchall()
     curl1.close()
     return json.dumps(rows1)
@@ -53,7 +54,7 @@ def inserir():
     media = float(request_data['media'])
     litros = float(request_data['litros'])
     print(media)
-
+    
     try:
         if media < 99:
             curl = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -69,24 +70,43 @@ def inserir():
 @app.route('/editar', methods=['POST'])
 def editar():
     request_data = json.loads(request.data)
-    cdapadrao = int(request_data['cdapadrao'])
     media = float(request_data['media'])
     litros = int(request_data['litros'])
+    id_cda = int(request_data['id_cda'])
+    id_modelo = int(request_data['id_modelo'])
 
-    
-    if media <= 99:
+
+
+    curl = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    curl.execute("select id_cda, id_modelo_veiculo from cda_padrao_abastecimentos where id_cda = %s and id_modelo_veiculo = %s",(id_cda,id_modelo,))
+    rows = curl.fetchall()
+    curl.close()
+    if rows == ():
+        print('qbosta')
         curl = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        curl.execute("UPDATE cda_padrao_abastecimentos SET qtd_litros_abastec_padrao = %s , media_padrao = %s  WHERE (id_cda_padrao_abastec =%s );",(litros,media,cdapadrao))
+        curl.execute("INSERT INTO cda_padrao_abastecimentos (id_cda, id_modelo_veiculo, qtd_litros_abastec_padrao, media_padrao) VALUES (%s, %s, %s, %s);",(id_cda,id_modelo,litros,media))
         rows = curl.fetchall()
         curl.close()
         mysql.connection.commit()
         return json.dumps(rows)
+        
     else:
-        print('a')
-        erro = {
-            'error'
-        }
-        return json.dumps(erro)
+        cdapadrao = int(request_data['id_CdaPadrao'])
+        
+        if media <= 99:
+            curl = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            curl.execute("UPDATE cda_padrao_abastecimentos SET qtd_litros_abastec_padrao = %s , media_padrao = %s  WHERE (id_cda_padrao_abastec =%s );",(litros,media,cdapadrao))
+            rows = curl.fetchall()
+            curl.close()
+            mysql.connection.commit()
+            return json.dumps(rows)
+        else:
+            erro = {
+                'error':1
+            }
+            return json.dumps(erro)
+
+    
 
     
 
@@ -95,12 +115,11 @@ def editar():
 @app.route('/deletar', methods=['POST'])
 def deletar():
     request_data = json.loads(request.data)
-    cdapadrao = int(request_data['cdapadrao'])
-    media = float(request_data['media'])
-    litros = int(request_data['litros'])
+    cdapadrao = int(request_data['id_CdaPadrao'])
+
 
     curl = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    curl.execute("UPDATE cda_padrao_abastecimentos SET qtd_litros_abastec_padrao = %s , media_padrao = %s  WHERE (id_cda_padrao_abastec =%s );",(litros,media,cdapadrao))
+    curl.execute("DELETE FROM cda_padrao_abastecimentos WHERE (id_cda_padrao_abastec = %s);",(cdapadrao,))
     rows = curl.fetchall()
     curl.close()
     mysql.connection.commit()
@@ -125,6 +144,13 @@ if __name__ == '__main__':
 
 
 
+# var url = "https://dicasdejavascript.com.br/exemplo.txt";//Sua URL
+
+# var xhttp = new XMLHttpRequest();
+# xhttp.open("GET", 'http://127.0.0.1:5000/cdas', false);
+# xhttp.send();//A execução do script pára aqui até a requisição retornar do servidor
+# console.log(xhttp.responseText);
+
 
 
 
@@ -146,3 +172,26 @@ if __name__ == '__main__':
 # 					where cpa.id_cda = cda.id_cda 
 # 					and cpa.id_modelo_veiculo = mv.id_modelo)
 # ;
+
+
+
+
+
+
+
+# EU QUE FIZ =)
+
+#     SELECT cpa1.id_cda_padrao_abastec
+# , cpa1.id_cda
+# , cpa1.id_modelo_veiculo
+# ,modelo_veiculos.descricao veiculo_descricao , cdas.descricao cda_descricao
+# ,cpa1.qtd_litros_abastec_padrao
+# ,cpa1.media_padrao 
+# FROM cda_padrao_abastecimentos cpa1
+# inner join cdas on cdas.id_cda =  cpa1.id_cda  
+# inner join modelo_veiculos on cpa1.id_modelo_veiculo  =  modelo_veiculos.id_modelo
+# where cpa1.id_cda = 2 AND modelo_veiculos.id_modelo = 2
+# union all 
+# select null, cda.id_cda, mv.id_modelo , mv.descricao, cda.descricao,0,0
+# FROM cdas cda, modelo_veiculos mv
+# where cda.id_cda = 2 AND  mv.id_modelo = 2

@@ -29,7 +29,12 @@ function Page() {
   //array mapeadas
   const [st_cda, setCDA] = useState([]);
   const [st_veiculo, setVEICULO] = useState([]);  
-  const [st_cdapadrao, setID_CDAPARAO] = useState([]);
+  const [ID_CDA, setID_CDA] = useState([]);
+  const [ID_CDAPadrao, setID_CDAPadrao] = useState([]);
+  const [id_modelo_veiculo, setid_modelo_veiculo] = useState([]);
+  const [Litosabastec, setLitosabastec] = useState([]);
+  const [MediaPadrao, setMediaPadrao] = useState([]);
+
 
   //formularios
   const [set_formlitros,  set_FormLitros] = useState([]);
@@ -115,11 +120,23 @@ function Page() {
   async function handleChangeVEICULONOVO(event){
     SetFormveiculo(event.target.value)
   }
+
+  async function handleChangeDeletar(event){
+    if (ID_CDAPadrao != null){
+          const Apagarformulario = { id_CdaPadrao:ID_CDAPadrao}
+          console.log(Apagarformulario)
+          const  res = await api.post('deletar',Apagarformulario)
+          window.location.reload();
+    }
+
+  }
+
   async function EnviaFormularioEditar(event){
     event.preventDefault()
-    const editarformulario = { cdapadrao:st_cdapadrao, media:set_formedia , litros:set_formlitros}
+    const editarformulario = { id_CdaPadrao:ID_CDAPadrao, id_cda:ID_CDA, id_modelo:id_modelo_veiculo, media:set_formedia , litros:set_formlitros}
     console.log(editarformulario)
     const  res = await api.post('editar',editarformulario)
+    window.location.reload();
     
 
   }
@@ -133,7 +150,7 @@ function Page() {
 
   //const
   const popup = () => {
-    setButtonPopupNOVO(true);
+    setButtonPopupDeletar(false)
   }
   const handleChangeMedia = (e) => {
     set_FormMedia(e.target.value);
@@ -153,22 +170,18 @@ function Page() {
   return(
     <div className="div1">
     <header><img src="https://media-exp1.licdn.com/dms/image/C510BAQHml9VWZyqWlw/company-logo_200_200/0/1519864734798?e=2159024400&v=beta&t=UVBa29_a_iO3R70BDj7pu07dBydfs8pPsEG5urcmjE4" width="50" height="50" className="logo" alt="website logo"/></header>
-    <h3>⠀⠀⠀⠀⠀⠀⠀⠀⠀Filtros</h3>
-    <FormControl className="enviar3" >
+  <table className="tabela1">
+    <thead>
+      <th>    
+        <FormControl >
     <NativeSelect id="demo-customized-select-native" value={indexCDAS} onChange={handleChangeCDA} input={<BootstrapInput />}>
-      <option value="0">Todos</option>
+      <option value="0">CDAS</option>
         {CDAS.map((posts) => (     
             <option value={posts.value}>{posts.label}</option>
       ))}
 
     </NativeSelect>
-  </FormControl>
-
-  <button className="enviar" onClick={popup}>Novo</button>
-
-  <table className="tabela1">
-    <thead>
-      <th>CDM</th>
+  </FormControl></th>
       <th>Modelo</th>
       <th>Qtd. de Litros</th>
       <th>Média Padrão</th>
@@ -188,16 +201,20 @@ function Page() {
                   setButtonPopup(true);
                   setCDA(posts.cda_descricao);
                   setVEICULO(posts.veiculo_descricao);
-                  setID_CDAPARAO(posts.id_cda_padrao_abastec);
+                  setID_CDA(posts.id_cda);
+                  setid_modelo_veiculo(posts.id_modelo_veiculo)
+                  setID_CDAPadrao(posts.id_cda_padrao_abastec)
                 }
                 }>✎</button>
                 </td>
                 <td className="X">
                 <button className="x2" onClick={() =>{
                   setButtonPopupDeletar(true);
+                  setID_CDAPadrao(posts.id_cda_padrao_abastec)
                   setCDA(posts.cda_descricao);
                   setVEICULO(posts.veiculo_descricao);
-                  setID_CDAPARAO(posts.id_cda_padrao_abastec);
+                  setLitosabastec(posts.qtd_litros_abastec_padrao)
+                  setMediaPadrao(posts.media_padrao)
                 }
                 }>X</button>  </td>
               </tr>
@@ -247,10 +264,21 @@ function Page() {
     </Popup>
 
     <Popup trigger={ButtonPopupDeletar} setTriger={setButtonPopupDeletar} >
-      <h2 className="text-center">deseja apagar?</h2>
+      <h2 className="text-center">deseja realmente deletar?</h2>
       <h1 className="text-center">{st_cda}</h1>
       <h1 className="text-center">{st_veiculo}</h1>
+      <div className="simenao">
+      <button className="enviar4 " onClick={
+        handleChangeDeletar
+      }>sim</button>
+      <button className="enviar" onClick={
+        popup
+      }>
+        
+        nao</button>
+        </div>
     </Popup>
+    
   </div>
   
 );

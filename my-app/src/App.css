@@ -335,3 +335,9 @@ select {
 .enviar4:hover{
   cursor: pointer;
 }
+
+.simenao{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

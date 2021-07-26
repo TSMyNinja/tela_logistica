@@ -16,6 +16,7 @@ function Page() {
 
   //array
   const [CDAS, setCDAS] = useState([]);
+  const [Veiculo, setVeiculo] = useState([]);
   const [Filter, setFilter] = useState([]);
   const [PesquisaVeiculo, setPesquisaVeiculo] = useState([]);
   const [set_formnewlitros,  set_FormNewLitros] = useState([]);
@@ -32,7 +33,7 @@ function Page() {
   const [ID_CDA, setID_CDA] = useState([]);
   const [ID_CDAPadrao, setID_CDAPadrao] = useState([]);
   const [id_modelo_veiculo, setid_modelo_veiculo] = useState([]);
-  const [Litosabastec, setLitosabastec] = useState([]);
+  const [Litosabastec, setLitros] = useState([]);
   const [MediaPadrao, setMediaPadrao] = useState([]);
 
 
@@ -44,6 +45,7 @@ function Page() {
   const [NewNewCda, SetNewCda] = React.useState("1");
   const [Formveiculo, SetFormveiculo] = React.useState("0");
   const [indexCDAS, setindexCDAS] = React.useState("0");
+  const [indexVEICULOS, setindexVEICULOS] = React.useState("0");
 
  //useEffect
   useEffect( () =>{
@@ -51,6 +53,15 @@ function Page() {
       const  res = await api.get('cdas');
       setCDAS(res.data)
     }
+
+    async function Iveiculos(){
+      const  res = await api.get('veiculo');
+      setVeiculo(res.data)
+    }
+
+
+
+    Iveiculos()
     getcda()
   }, [])
 
@@ -70,6 +81,23 @@ function Page() {
     Newform()
     getfilter()
   }, [indexCDAS])
+
+
+
+  useEffect( () =>{
+
+    async function ApiPostVeic(){
+      const dados = {value:indexVEICULOS}
+      if (indexVEICULOS != 0){
+        const  res = await api.post('veiculos',dados)
+        console.log(indexVEICULOS,'tesss')
+        setFilter(res.data)
+      }
+
+    }
+
+    ApiPostVeic()
+  }, [indexVEICULOS])
 
   //css Select
   const BootstrapInput = withStyles((theme) => ({
@@ -111,6 +139,17 @@ function Page() {
   async function handleChangeCDA(event){
     setindexCDAS(event.target.value)
   }
+
+  async function handleChangeVeiculo(event){
+    setindexVEICULOS(event.target.value)
+  }
+
+
+
+
+
+
+
   async function handleChangeCDANOVO(event){
     SetNewCda(event.target.value)
     const dados = {value:event.target.value}
@@ -124,7 +163,6 @@ function Page() {
   async function handleChangeDeletar(event){
     if (ID_CDAPadrao != null){
           const Apagarformulario = { id_CdaPadrao:ID_CDAPadrao}
-          console.log(Apagarformulario)
           const  res = await api.post('deletar',Apagarformulario)
           window.location.reload();
     }
@@ -134,7 +172,6 @@ function Page() {
   async function EnviaFormularioEditar(event){
     event.preventDefault()
     const editarformulario = { id_CdaPadrao:ID_CDAPadrao, id_cda:ID_CDA, id_modelo:id_modelo_veiculo, media:set_formedia , litros:set_formlitros}
-    console.log(editarformulario)
     const  res = await api.post('editar',editarformulario)
     window.location.reload();
     
@@ -182,7 +219,17 @@ function Page() {
 
     </NativeSelect>
   </FormControl></th>
-      <th>Modelo</th>
+      <th>
+    <FormControl >
+      <NativeSelect id="demo-customized-select-native" value={indexVEICULOS} onChange={handleChangeVeiculo} input={<BootstrapInput />}>
+        <option value="0">VEICULOS</option>
+          {Veiculo.map((posts) => (     
+              <option value={posts.id_modelo}>{posts.descricao}</option>
+        ))}
+
+      </NativeSelect>
+    </FormControl>
+      </th>
       <th>Qtd. de Litros</th>
       <th>Média Padrão</th>
       <th>Editar</th>
@@ -213,7 +260,7 @@ function Page() {
                   setID_CDAPadrao(posts.id_cda_padrao_abastec)
                   setCDA(posts.cda_descricao);
                   setVEICULO(posts.veiculo_descricao);
-                  setLitosabastec(posts.qtd_litros_abastec_padrao)
+                  setLitros(posts.qtd_litros_abastec_padrao)
                   setMediaPadrao(posts.media_padrao)
                 }
                 }>X</button>  </td>
@@ -267,16 +314,15 @@ function Page() {
       <h2 className="text-center">deseja realmente deletar?</h2>
       <h1 className="text-center">{st_cda}</h1>
       <h1 className="text-center">{st_veiculo}</h1>
-      <div className="simenao">
+    <div className="simenao">        
       <button className="enviar4 " onClick={
         handleChangeDeletar
       }>sim</button>
       <button className="enviar" onClick={
         popup
       }>
-        
         nao</button>
-        </div>
+    </div>
     </Popup>
     
   </div>

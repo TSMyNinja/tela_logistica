@@ -16,6 +16,29 @@ def banco1():
     return json.dumps(rows)
 
 
+
+@app.route('/veiculos', methods=['POST'])
+def veiculos():
+    print('teste')
+    request_data = json.loads(request.data)
+    modeloVeiculo = request_data['value']
+    print(modeloVeiculo)
+    curl = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    curl.execute("SELECT cpa1.id_cda_padrao_abastec, cpa1.id_cda, cpa1.id_modelo_veiculo,modelo_veiculos.descricao veiculo_descricao , cdas.descricao cda_descricao,cpa1.qtd_litros_abastec_padrao,cpa1.media_padrao  FROM cda_padrao_abastecimentos cpa1 inner join cdas on cdas.id_cda =  cpa1.id_cda   inner join modelo_veiculos on cpa1.id_modelo_veiculo  =  modelo_veiculos.id_modelo and modelo_veiculos.id_modelo = %s union all  select null, cda.id_cda, mv.id_modelo, mv.descricao, cda.descricao,0,0  FROM cdas cda, modelo_veiculos mv where not exists (select null from cda_padrao_abastecimentos cpa where cpa.id_cda = cda.id_cda and cpa.id_modelo_veiculo = mv.id_modelo) and mv.id_modelo = %s;",(modeloVeiculo,modeloVeiculo,))
+    rows = curl.fetchall()
+    curl.close()
+    return json.dumps(rows)
+
+@app.route('/veiculo', methods=['GET'])
+def veiculoo():
+
+    curl = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    curl.execute("SELECT * FROM modelo_veiculos;")
+    rows = curl.fetchall()
+    curl.close()
+    return json.dumps(rows)    
+
+
 @app.route('/pesquisa', methods=['POST'])
 def pesquisa():
     request_data = json.loads(request.data)
@@ -30,7 +53,6 @@ def pesquisa():
 def banco3():
     request_data = json.loads(request.data)
     id_cda = int(request_data['value'])
-    print(id_cda)
 
     if id_cda == 0:
         curl1 = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -53,7 +75,6 @@ def inserir():
     id_modelo = int(request_data['id_modelo'])
     media = float(request_data['media'])
     litros = float(request_data['litros'])
-    print(media)
     
     try:
         if media < 99:
@@ -82,7 +103,6 @@ def editar():
     rows = curl.fetchall()
     curl.close()
     if rows == ():
-        print('qbosta')
         curl = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         curl.execute("INSERT INTO cda_padrao_abastecimentos (id_cda, id_modelo_veiculo, qtd_litros_abastec_padrao, media_padrao) VALUES (%s, %s, %s, %s);",(id_cda,id_modelo,litros,media))
         rows = curl.fetchall()
@@ -138,6 +158,15 @@ if __name__ == '__main__':
 
 
 
+
+
+
+# var xhr = new XMLHttpRequest();
+# xhr.open("POST", 'http://127.0.0.1:5000/deletar', true);
+# xhr.setRequestHeader('Content-Type', 'application/json');
+# xhr.send(JSON.stringify({
+#     id_CdaPadrao: 57
+# }));
 
 
 

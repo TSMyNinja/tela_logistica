@@ -11,12 +11,14 @@
     "axios": "^0.21.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-draggable": "^4.4.3",
     "react-dropdown-select": "^4.7.4",
     "react-scripts": "4.0.3",
     "react-select": "^4.3.1",
     "react-select-search": "^3.0.8",
     "reactjs-popup": "^2.0.5",
-    "web-vitals": "^1.1.2"
+    "web-vitals": "^1.1.2",
+    "wijmo": "^5.20211.794"
   },
   "scripts": {
     "start": "react-scripts start",

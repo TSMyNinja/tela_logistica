@@ -67,7 +67,7 @@ function Page() {
 
   useEffect( () =>{
     async function getfilter(){
-      const dados = {value:indexCDAS}
+      const dados = {value:indexCDAS, veiculos:indexVEICULOS}
       const  res = await api.post('filter',dados)
       setFilter(res.data)
     }
@@ -80,24 +80,9 @@ function Page() {
 
     Newform()
     getfilter()
-  }, [indexCDAS])
+  }, [indexCDAS,indexVEICULOS])
 
 
-
-  useEffect( () =>{
-
-    async function ApiPostVeic(){
-      const dados = {value:indexVEICULOS}
-      if (indexVEICULOS != 0){
-        const  res = await api.post('veiculos',dados)
-        console.log(indexVEICULOS,'tesss')
-        setFilter(res.data)
-      }
-
-    }
-
-    ApiPostVeic()
-  }, [indexVEICULOS])
 
   //css Select
   const BootstrapInput = withStyles((theme) => ({

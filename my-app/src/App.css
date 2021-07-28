@@ -77,12 +77,17 @@ header {
 
 }
 
+th {
+  background-color: rgb(59, 59, 59);
+
+}
+
 tr {
   text-align: center;
   border: solid 2px rgb(255, 255, 255);
   border-top: transparent;
   margin: 0%;
-  background-color: rgb(59, 59, 59);
+  background-color: rgb(87, 87, 87);
 }
 
 h2 {
@@ -213,7 +218,7 @@ select {
 
 .editar{
   width: 100%;
-  background-color: rgb(59, 59, 59);
+  background-color: rgba(59, 59, 59, 0);
   border: none;
   height: 100%;
   color: #ffffff;
@@ -340,4 +345,8 @@ select {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+tr:nth-child(even) {
+  background-color: rgb(59, 59, 59);
 }

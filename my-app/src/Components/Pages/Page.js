@@ -12,33 +12,10 @@ import Popup from '../Pages/teste';
 
 function Page() {
 
-  //array
-  //array
+
   const [CDAS, setCDAS] = useState([]);
   const [Veiculo, setVeiculo] = useState([]);
   const [Filter, setFilter] = useState([]);
-
-  //popups
-  const [buttonPopup, setButtonPopup] = useState(false);
-
-  //array mapeadas
-  const [cda, setCDA] = useState([]);
-  const [veiculo, setVEICULO] = useState([]);  
-  const [ID_CDA, setID_CDA] = useState([]);
-  const [ID_CDAPadrao, setID_CDAPadrao] = useState([]);
-  const [id_modelo_veiculo, setid_modelo_veiculo] = useState([]);
-
-
-  //formularios
-  const [formlitros,  setFormLitros] = useState([]);
-  const [formedia, setFormMedia] = useState([]);
-
-  //Select
-  const [indexCDAS, setindexCDAS] = React.useState("0");
-  const [indexVEICULOS, setindexVEICULOS] = React.useState("0");
-  const [CDA0, setCDA0] = React.useState("0");
-
- //useEffect e api
   useEffect( () =>{
     async function getcda(){
       const  res = await api.get('cdas');
@@ -54,9 +31,7 @@ function Page() {
     getcda()
   }, [])
 
-  
   useEffect( () =>{
-    console.log(CDA0)
     async function getCda0(){
     if(CDA0 != 0){
       const dados = {indexcda:indexCDAS, indexveiculos:indexVEICULOS}
@@ -74,18 +49,42 @@ function Page() {
   getCda0()
   }, [CDA0,indexCDAS,indexVEICULOS])
 
-
-
-
-
-
   async function EnviaFormularioEditar(e){
     e.preventDefault()
-    const editarformulario = { id_CdaPadrao:ID_CDAPadrao, id_cda:ID_CDA, id_modelo:id_modelo_veiculo, media:formedia , litros:formlitros}
+    const editarformulario = { id_CdaPadrao:Post.id_cda_padrao_abastec, id_cda:Post.id_cda, id_modelo:Post.id_modelo_veiculo, media:formedia , litros:formlitros}
     await api.post('editar',editarformulario)
     window.location.reload();
     
   }
+
+
+
+  //front
+  const [Post, setPost] = useState([]);
+  const [formlitros,  setFormLitros] = useState([]);
+  const [formedia, setFormMedia] = useState([]);
+  const [indexCDAS, setindexCDAS] = React.useState("0");
+  const [indexVEICULOS, setindexVEICULOS] = React.useState("0");
+  const [CDA0, setindexCDA0] = React.useState("0");
+  const [buttonPopup, setButtonPopup] = useState(false);
+  const handleChangeMedia = (e) => {
+    setFormMedia(e.target.value);
+  }
+  const handleChangeLitros = (e) => {
+    setFormLitros(e.target.value);
+  }
+  async function handleChangeCDA(e){
+    setindexCDAS(e.target.value)
+  }
+  async function handleChangeVeiculo(e){
+    setindexVEICULOS(e.target.value)
+  }
+  async function handleChangeCDA0(e){
+    setindexCDA0(e.target.value)
+  }
+
+
+
 
 
 
@@ -124,28 +123,8 @@ function Page() {
     },
   }))(InputBase);
 
-  //async
-  async function handleChangeCDA(e){
-    setindexCDAS(e.target.value)
-  }
-  async function handleChangeVeiculo(e){
-    setindexVEICULOS(e.target.value)
-  }
-  async function handleChangeCDA0(e){
-    setCDA0(e.target.value)
-  }
 
 
-
-
-  //const
-
-  const handleChangeMedia = (e) => {
-    setFormMedia(e.target.value);
-  }
-  const handleChangeLitros = (e) => {
-    setFormLitros(e.target.value);
-  }
 
   return(
     <div className="div1">
@@ -154,70 +133,51 @@ function Page() {
     
     <thead>
       <tr>
-        <th >    
-          <FormControl >
+        <th><FormControl>
+
             <NativeSelect id="demo-customized-select-native" value={indexCDAS} onChange={handleChangeCDA} input={<BootstrapInput />}>
               <option value="0">CDAS</option>
-                {CDAS.map((posts, index) => (     
-                    <option key={index} value={posts.id_cda}>{posts.descricao}</option>
-              ))}
-
+                {CDAS.map((posts, index) => ( <option key={index} value={posts.id_cda}>{posts.descricao}</option> ))}
             </NativeSelect>
           </FormControl></th>
-        <th>
-          <FormControl >
+        <th><FormControl>
+
             <NativeSelect id="demo-customized-select-native" value={indexVEICULOS} onChange={handleChangeVeiculo} input={<BootstrapInput />}>
               <option value="0">VEICULOS</option>
-                {Veiculo.map((posts, index) => (     
-                    <option key={index} value={posts.id_modelo}>{posts.descricao}</option>
-              ))}
-
+                {Veiculo.map((posts, index) => ( <option key={index} value={posts.id_modelo}>{posts.descricao}</option>))}
             </NativeSelect>
           </FormControl>
         </th>
-        <th><FormControl >
+        <th><FormControl>
+
             <NativeSelect id="demo-customized-select-native" value={CDA0} onChange={handleChangeCDA0} input={<BootstrapInput />}>
               <option value="0">Qtd. Litros</option>
               <option value="1">0</option>
-
-
             </NativeSelect>
           </FormControl></th>
         <th>Média Padrão</th>
         <th>Editar</th>
       </tr>
     </thead>
-      {
-        (Filter) && 
+      {(Filter) && 
           <tbody>
             {Filter.map((posts, index) => (     
-                <tr key={index}>
-                  <td>{posts.cda_descricao}</td>
-                  <td>{posts.veiculo_descricao}</td>
-                  <td>{posts.qtd_litros_abastec_padrao}</td>
-                  <td>{posts.media_padrao}</td>
-                  <td>  <button className="editar" onClick={() =>{
-                    setButtonPopup(true);
-                    setCDA(posts.cda_descricao);
-                    setVEICULO(posts.veiculo_descricao);
-                    setID_CDA(posts.id_cda);
-                    setid_modelo_veiculo(posts.id_modelo_veiculo)
-                    setID_CDAPadrao(posts.id_cda_padrao_abastec)
-                    setFormLitros(posts.qtd_litros_abastec_padrao)
-                    setFormMedia(posts.media_padrao)
-                  }
-                  }>✎</button>
-                  </td>
-                </tr>
-          ))}
+              <tr key={index}>
+                <td>{posts.cda_descricao}</td>
+                <td>{posts.veiculo_descricao}</td>
+                <td>{posts.qtd_litros_abastec_padrao}</td>
+                <td>{posts.media_padrao}</td>
+                <td>  <button className="editar" onClick={() =>{setButtonPopup(true); setPost(posts); setFormMedia(posts.media_padrao); setFormLitros(posts.qtd_litros_abastec_padrao);}}>✎</button></td>
+              </tr>
+        ))}
         </tbody>
       }
     </table>
     
       
       <Popup trigger={buttonPopup} setTriger={setButtonPopup} >
-        <h1 className="text-center">{cda}</h1>
-        <h1 className="text-center">{veiculo}</h1>
+        <h1 className="text-center">{Post.cda_descricao}</h1>
+        <h1 className="text-center">{Post.veiculo_descricao}</h1>
           <form className="form-center"  onSubmit={EnviaFormularioEditar}>
             <h3 className="text-center">Qtd. de Litros</h3>
             <input type="number" min="1" className="input just-name" value={formlitros} onChange={handleChangeLitros}></input >

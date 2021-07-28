@@ -37,12 +37,12 @@ def banco3():
     if veiculos == 0 and id_cda == 0:
             curl1 = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
             curl1.execute("SELECT cpa1.id_cda_padrao_abastec, cpa1.id_cda, cpa1.id_modelo_veiculo,modelo_veiculos.descricao veiculo_descricao , cdas.descricao cda_descricao,cpa1.qtd_litros_abastec_padrao,cpa1.media_padrao FROM cda_padrao_abastecimentos cpa1 inner join cdas on cdas.id_cda =  cpa1.id_cda inner join modelo_veiculos on cpa1.id_modelo_veiculo  =  modelo_veiculos.id_modelo union all select null, cda.id_cda, mv.id_modelo, mv.descricao, cda.descricao,0,0 FROM cdas cda, modelo_veiculos mv where not exists (select null from cda_padrao_abastecimentos cpa where cpa.id_cda = cda.id_cda and cpa.id_modelo_veiculo = mv.id_modelo) order by cda_descricao asc ;")
-            rows1 = curl1.fetchall()
+            rows1 = curl1.fetchall()    
             curl1.close()
             return json.dumps(rows1)
     elif veiculos == 0:
             curl1 = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-            curl1.execute("SELECT cpa1.id_cda_padrao_abastec, cpa1.id_cda, cpa1.id_modelo_veiculo,modelo_veiculos.descricao veiculo_descricao , cdas.descricao cda_descricao,cpa1.qtd_litros_abastec_padrao,cpa1.media_padrao FROM cda_padrao_abastecimentos cpa1 inner join cdas on cdas.id_cda =  cpa1.id_cda and cdas.id_cda = %s inner join modelo_veiculos on cpa1.id_modelo_veiculo  =  modelo_veiculos.id_modelo union all select null, cda.id_cda, mv.id_modelo, mv.descricao, cda.descricao,0,0 FROM cdas cda, modelo_veiculos mv where not exists (select null from cda_padrao_abastecimentos cpa where cpa.id_cda = cda.id_cda and cpa.id_modelo_veiculo = mv.id_modelo) and cda.id_cda =%s;",(id_cda,id_cda,))
+            curl1.execute("SELECT cpa1.id_cda_padrao_abastec, cpa1.id_cda, cpa1.id_modelo_veiculo,modelo_veiculos.descricao veiculo_descricao , cdas.descricao cda_descricao,cpa1.qtd_litros_abastec_padrao,cpa1.media_padrao FROM cda_padrao_abastecimentos cpa1 inner join cdas on cdas.id_cda =  cpa1.id_cda and cdas.id_cda = %s inner join modelo_veiculos on cpa1.id_modelo_veiculo  =  modelo_veiculos.id_modelo union all select null, cda.id_cda, mv.id_modelo, mv.descricao, cda.descricao,0,0 FROM cdas cda, modelo_veiculos mv where not exists (select null from cda_padrao_abastecimentos cpa where cpa.id_cda = cda.id_cda and cpa.id_modelo_veiculo = mv.id_modelo) and cda.id_cda =%s ;",(id_cda,id_cda,))
             rows1 = curl1.fetchall()
             curl1.close()
             return json.dumps(rows1)
@@ -131,74 +131,3 @@ def deletar():
  
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
-
-
-
-
-
-# var xhr = new XMLHttpRequest();
-# xhr.open("POST", 'http://127.0.0.1:5000/deletar', true);
-# xhr.setRequestHeader('Content-Type', 'application/json');
-# xhr.send(JSON.stringify({
-#     id_CdaPadrao: 57
-# }));
-
-
-
-
-
-
-# var url = "https://dicasdejavascript.com.br/exemplo.txt";//Sua URL
-
-# var xhttp = new XMLHttpRequest();
-# xhttp.open("GET", 'http://127.0.0.1:5000/cdas', false);
-# xhttp.send();//A execução do script pára aqui até a requisição retornar do servidor
-# console.log(xhttp.responseText);
-
-
-
-
-
-#     SELECT cpa1.id_cda_padrao_abastec
-# , cpa1.id_cda
-# , cpa1.id_modelo_veiculo
-# ,modelo_veiculos.descricao veiculo_descricao , cdas.descricao cda_descricao
-# ,cpa1.qtd_litros_abastec_padrao
-# ,cpa1.media_padrao 
-# FROM cda_padrao_abastecimentos cpa1
-# inner join cdas on cdas.id_cda =  cpa1.id_cda  
-# inner join modelo_veiculos on cpa1.id_modelo_veiculo  =  modelo_veiculos.id_modelo
-# union all 
-# select null, cda.id_cda, mv.id_modelo, mv.descricao, cda.descricao,0,0 
-# FROM cdas cda, modelo_veiculos mv
-# where not exists (select null 
-# 					from cda_padrao_abastecimentos cpa 
-# 					where cpa.id_cda = cda.id_cda 
-# 					and cpa.id_modelo_veiculo = mv.id_modelo)
-# ;
-
-
-
-
-
-
-
-# EU QUE FIZ =)
-
-#     SELECT cpa1.id_cda_padrao_abastec
-# , cpa1.id_cda
-# , cpa1.id_modelo_veiculo
-# ,modelo_veiculos.descricao veiculo_descricao , cdas.descricao cda_descricao
-# ,cpa1.qtd_litros_abastec_padrao
-# ,cpa1.media_padrao 
-# FROM cda_padrao_abastecimentos cpa1
-# inner join cdas on cdas.id_cda =  cpa1.id_cda  
-# inner join modelo_veiculos on cpa1.id_modelo_veiculo  =  modelo_veiculos.id_modelo
-# where cpa1.id_cda = 2 AND modelo_veiculos.id_modelo = 2
-# union all 
-# select null, cda.id_cda, mv.id_modelo , mv.descricao, cda.descricao,0,0
-# FROM cdas cda, modelo_veiculos mv
-# where cda.id_cda = 2 AND  mv.id_modelo = 2

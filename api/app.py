@@ -69,7 +69,7 @@ def inserir():
     litros = float(request_data['litros'])
     
     try:
-        if media < 99:
+        if media <= 99:
             curl = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
             curl.execute("INSERT INTO cda_padrao_abastecimentos ( id_cda, id_modelo_veiculo,qtd_litros_abastec_padrao,media_padrao) VALUES ('%s', '%s', '%s', '%s');",(id_cda,id_modelo,litros,media))
             rows = curl.fetchall()
@@ -116,15 +116,38 @@ def editar():
 
     
 
-@app.route('/deletar', methods=['POST'])
-def deletar():
+@app.route('/CDA0', methods=['POST'])
+def Cda0():
     request_data = json.loads(request.data)
-    cdapadrao = int(request_data['id_CdaPadrao'])
-    curl = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    curl.execute("DELETE FROM cda_padrao_abastecimentos WHERE (id_cda_padrao_abastec = %s);",(cdapadrao,))
-    rows = curl.fetchall()
-    curl.close()
-    mysql.connection.commit()
+    id_cda = int(request_data['indexcda'])
+    id_modelo = int(request_data['indexveiculos'])
+
+    if id_cda == 0 and id_modelo == 0:
+        curl = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        curl.execute("select null id_cda_padrao_abastec , cda.id_cda, mv.id_modelo id_modelo_veiculo, mv.descricao veiculo_descricao , cda.descricao cda_descricao,0 qtd_litros_abastec_padrao,0 media_padrao FROM cdas cda, modelo_veiculos mv where not exists (select null from cda_padrao_abastecimentos cpa where cpa.id_cda = cda.id_cda and cpa.id_modelo_veiculo = mv.id_modelo) order by cda.id_cda asc ")
+        rows = curl.fetchall()
+        curl.close()
+        mysql.connection.commit()
+    elif id_cda == 0:
+        curl = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        curl.execute("select null id_cda_padrao_abastec , cda.id_cda, mv.id_modelo id_modelo_veiculo, mv.descricao veiculo_descricao , cda.descricao cda_descricao,0 qtd_litros_abastec_padrao,0 media_padrao FROM cdas cda, modelo_veiculos mv where not exists (select null from cda_padrao_abastecimentos cpa where cpa.id_cda = cda.id_cda and cpa.id_modelo_veiculo = mv.id_modelo) and mv.id_modelo = %s ",(id_modelo,))
+        rows = curl.fetchall()
+        curl.close()
+        mysql.connection.commit()
+    elif id_modelo == 0:
+        curl = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        curl.execute("select null id_cda_padrao_abastec , cda.id_cda, mv.id_modelo id_modelo_veiculo, mv.descricao veiculo_descricao , cda.descricao cda_descricao,0 qtd_litros_abastec_padrao,0 media_padrao FROM cdas cda, modelo_veiculos mv where not exists (select null from cda_padrao_abastecimentos cpa where cpa.id_cda = cda.id_cda and cpa.id_modelo_veiculo = mv.id_modelo) and cda.id_cda = %s ",(id_cda,))
+        rows = curl.fetchall()
+        curl.close()
+        mysql.connection.commit()
+
+    else:
+        curl = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        curl.execute("select null id_cda_padrao_abastec , cda.id_cda, mv.id_modelo id_modelo_veiculo, mv.descricao veiculo_descricao , cda.descricao cda_descricao,0 qtd_litros_abastec_padrao,0 media_padrao FROM cdas cda, modelo_veiculos mv where not exists (select null from cda_padrao_abastecimentos cpa where cpa.id_cda = cda.id_cda and cpa.id_modelo_veiculo = mv.id_modelo) and cda.id_cda  = %s and mv.id_modelo = %s ",(id_cda,id_modelo,))
+        rows = curl.fetchall()
+        curl.close()
+        mysql.connection.commit()
+
 
     return json.dumps(rows)
 
